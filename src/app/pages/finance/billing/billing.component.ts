@@ -37,7 +37,7 @@ export class BillingComponent implements OnInit {
   async toggleRow(element: Bill) {
 
     this.billDetailData = await this.FinanceService.getBillDetails(Number(element.billNo)); 
-    this.ss = new MatTableDataSource(this.billDetailData);
+    this.billDetialDataSource = new MatTableDataSource(this.billDetailData);
     this.expandedElement = element;
     console.log('');
     // element.addresses && (element.addresses as MatTableDataSource<Address>).data.length ? (this.expandedElement = this.expandedElement === element ? null : element) : null;
