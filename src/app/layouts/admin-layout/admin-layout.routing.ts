@@ -17,6 +17,8 @@ import { NewAppointmentComponent } from 'app/pages/appointments/new-appointment/
 import { ViewAppointmentsComponent } from 'app/pages/appointments/view-appointments/view-appointments.component';
 import { DentalComponent } from 'app/pages/facilities/dental/dental.component';
 import { AppointmentsDataComponent } from 'app/tabs/appointments-data/appointments-data.component';
+import { BillingComponent } from 'app/pages/finance/billing/billing.component';
+import { ViewLaboratoryComponent } from 'app/pages/facilities/laboratory/view-laboratory/view-laboratory.component';
 
 export const AdminLayoutRoutes: Routes = [
     // {
@@ -75,5 +77,7 @@ export const AdminLayoutRoutes: Routes = [
     { path: 'view-employees',    component: ViewEmployeesComponent},
     { path: 'view-appointments',    component: ViewAppointmentsComponent},
     { path: 'dental',    component: DentalComponent},
-    { path: 'appointment-data',    component: DentalComponent}
+    { path: 'appointment-data',    component: DentalComponent},
+    { path: 'billing',    component: BillingComponent},    
+    { path: 'laboratory',    component: ViewLaboratoryComponent}
 ];

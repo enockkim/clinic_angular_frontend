@@ -25,5 +25,15 @@ export interface PaymentDetails{
   reference: string;
 }       
 
+export interface AccountsReceivable{
+  transactionId?: number;
+  amountDue?: number;
+  amountPaid: number;
+  dateOfTransaction: Date;
+  paymentMethod?: number;
+  cashType: number;
+  billDetailEntryNo: number;
+  transactionRefrence: string; 
+}
 
 

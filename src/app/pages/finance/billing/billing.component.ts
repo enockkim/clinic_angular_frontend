@@ -10,7 +10,14 @@ import { PayBillComponent } from '../../../pages/finance/pay-bill/pay-bill.compo
 @Component({
   selector: 'app-billing',
   templateUrl: './billing.component.html',
-  styleUrls: ['./billing.component.scss']
+  styleUrls: ['./billing.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({height: '0px', minHeight: '0'})),
+      state('expanded', style({height: '*'})),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 export class BillingComponent implements OnInit {
 
@@ -23,10 +30,15 @@ export class BillingComponent implements OnInit {
   billData: Bill[];
   billDataSource: MatTableDataSource<Bill>;
   billDetailData: BillDetail[];
-  billDetialDataSource: MatTableDataSource<BillDetail>;
+  billDetailDataSource: MatTableDataSource<BillDetail>;
+
+  billDataColumnsToDisplay: string[] = ['billNo', 'appointmentId'];
+  billDetailsColumnsToDisplay: string[] = ['entryNo', 'facility', 'details', 'cost'];  
+  columnsToDisplayWithExpand = [...this.billDataColumnsToDisplay, 'expand'];
 
   expandedElement: Bill | null;
-  billTotal: number = 0;
+  billNo: number;
+  // billTotal: number = 0;
 
   async ngOnInit() {
     this.billData = await this.FinanceService.getBills()  
@@ -35,11 +47,12 @@ export class BillingComponent implements OnInit {
   }
 
   async toggleRow(element: Bill) {
-
+    this.billDetailDataSource = null;
     this.billDetailData = await this.FinanceService.getBillDetails(Number(element.billNo)); 
-    this.billDetialDataSource = new MatTableDataSource(this.billDetailData);
+    this.billDetailDataSource = new MatTableDataSource(this.billDetailData);
+    this.billNo = element.billNo;
     this.expandedElement = element;
-    console.log('');
+    console.log(this.billDetailData[0]);
     // element.addresses && (element.addresses as MatTableDataSource<Address>).data.length ? (this.expandedElement = this.expandedElement === element ? null : element) : null;
     // this.cd.detectChanges();
     // this.innerTables.forEach((table, index) => (table.dataSource as MatTableDataSource<Address>).sort = this.innerSort.toArray()[index]);
@@ -50,12 +63,13 @@ export class BillingComponent implements OnInit {
   // }
 
   
-  openDialog(enterAnimationDuration: string, exitAnimationDuration: string, billData: BillDetail[]): void {
-    billData.forEach(billEntry => {
-      this.billTotal += billEntry.cost;
+  openDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
+    var billTotal = 0;
+    this.billDetailData.forEach(function (billEntry){
+      billTotal += billEntry.cost;
     });
     const dial = this.dialog.open(PayBillComponent, {
-      data: { billTotal: this.billTotal, billNo: billData[0].billNo },
+      data: { billTotal: billTotal, billNo: this.billDetailData[0].billNo },
       width: "50%",
       height: "",
     });
@@ -64,8 +78,8 @@ export class BillingComponent implements OnInit {
     .subscribe(res => {
       console.log("pay bill result: "+res);
       if(res){
-        //find the index of the updated element
-        const index = this.billData.findIndex(bill => bill.billNo === billData[0].billNo);
+        //find the index of the updated elementc
+        const index = this.billData.findIndex(bill => bill.billNo === this.billDetailData[0].billNo);
         // replace the element at that index with the updated appointment data
         if (index !== -1) {
           this.billData[index] = res;

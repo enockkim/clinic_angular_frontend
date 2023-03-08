@@ -36,6 +36,7 @@ import { EditRemarksComponent } from './pages/appointments/edit-remarks/edit-rem
 import { CreateLaboratoryRequestComponent } from './pages/facilities/laboratory/create-laboratory-request/create-laboratory-request.component';
 import { BillingComponent } from './pages/finance/billing/billing.component';
 import { PayBillComponent } from './pages/finance/pay-bill/pay-bill.component';
+import { ViewLaboratoryComponent } from './pages/facilities/laboratory/view-laboratory/view-laboratory.component';
 
 @NgModule({
   imports: [
@@ -78,6 +79,7 @@ import { PayBillComponent } from './pages/finance/pay-bill/pay-bill.component';
     CreateLaboratoryRequestComponent,
     BillingComponent,
     PayBillComponent,
+    ViewLaboratoryComponent,
 
   ],
   providers: [],
