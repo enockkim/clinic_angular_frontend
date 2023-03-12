@@ -44,6 +44,8 @@ export class ViewLaboratoryComponent implements OnInit {
   DataSource: MatTableDataSource<AppointmentData>;
   DetailData: LaboratoryRequest[];
   facilitiesResult: Facility[];
+  finishedLabs: number[];
+  prefferedFacilty: number;
   FormData:  LaboratoryRequest = {
     labId: null,
     labTypeId: null,
@@ -57,7 +59,7 @@ export class ViewLaboratoryComponent implements OnInit {
   DetailDataSource: MatTableDataSource<LaboratoryRequest>;
 
   DataColumnsToDisplay: string[] = ['appointmentId', 'patientName'];
-  DetailsColumnsToDisplay: string[] = ['labId', 'falabTypeIdcility', 'labResults', 'labTechRemarks', 'actions'];  
+  DetailsColumnsToDisplay: string[] = ['labId', 'facility', 'labResults', 'labTechRemarks', 'actions'];  
   columnsToDisplayWithExpand = [...this.DataColumnsToDisplay, 'expand'];
 
   expandedElement: AppointmentData | null;
@@ -67,10 +69,10 @@ export class ViewLaboratoryComponent implements OnInit {
     this.form = this.fb.group({
       labResult: ['', Validators.required],
       labTechRemarks: ['', Validators.required],
-      facility: ['', Validators.required],
+      facility: [this.prefferedFacilty, Validators.required],
     });
 
-    this.Data = await this.AppointmentService.getAppointments(1,15);
+    this.Data = await this.AppointmentService.getAppointments(1,3);
     this.DataSource = new MatTableDataSource(this.Data);    
     this.facilitiesResult = await this.FacilityService.getFacilities();
   }
@@ -81,9 +83,10 @@ export class ViewLaboratoryComponent implements OnInit {
       this.FormData.labResults = formData.labResult;
       this.FormData.labTechRemarks = formData.labTechRemarks;
       this.FormData.status = formData.facility; //misusing property need to implement properly
-
+      
       if(await this.LaboratoryService.transferLab(this.FormData)){
-        this.DetailDataSource.data = this.DetailData.filter(lab => lab.labId != this.FormData.labId);
+        this.finishedLabs.push(this.FormData.labId);
+        this.DetailDataSource = new MatTableDataSource(this.DetailData.filter(lab => this.finishedLabs.includes(lab.labId) == false && lab.status == 0));
       }else{
         //error transferring
       }
@@ -92,8 +95,21 @@ export class ViewLaboratoryComponent implements OnInit {
 
   async toggleRow(appointmentData: AppointmentData){
     //expand  row
-    this.DetailData = await this.LaboratoryService.getLaboratoryRequestsByAppointmentId(156);
-    this.DetailDataSource = new MatTableDataSource(this.DetailData);
+    this.finishedLabs = null;
+    switch(appointmentData.appointmentType){
+      case 1:
+        this.prefferedFacilty = 15;
+        break;
+      case 2:
+      case 3: 
+        this.prefferedFacilty = 1;
+        break;
+      default:
+        this.prefferedFacilty = 1;
+        break;
+    }
+    this.DetailData = await this.LaboratoryService.getLaboratoryRequestsByAppointmentId(appointmentData.appointmentId);
+    this.DetailDataSource = new MatTableDataSource(this.DetailData.filter(labDetail => labDetail.status == 0));
     this.expandedElement = appointmentData;
   }
   loadForm(labDetail: LaboratoryRequest): void{

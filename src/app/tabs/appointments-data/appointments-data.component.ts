@@ -126,6 +126,7 @@ export class AppointmentsDataComponent implements OnInit {
   }
 
   async transferAppointment(appointmentData: AppointmentData){
+    appointmentData.appointmentStatus = 3;
     const res = await this.AppointmentService.tranferAppointment(appointmentData);
     if(res){
       this.dataSource.data = this.appointments.filter(appointment => appointment.appointmentId != appointmentData.appointmentId);

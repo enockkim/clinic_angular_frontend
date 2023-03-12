@@ -42,14 +42,14 @@ export class BillingComponent implements OnInit {
 
   async ngOnInit() {
     this.billData = await this.FinanceService.getBills()  
-    this.billDataSource = new MatTableDataSource(this.billData);
+    this.billDataSource = new MatTableDataSource(this.billData.filter(bill => bill.status == 0));
     // this.billDataSource.sort = this.sort;
   }
 
   async toggleRow(element: Bill) {
     this.billDetailDataSource = null;
     this.billDetailData = await this.FinanceService.getBillDetails(Number(element.billNo)); 
-    this.billDetailDataSource = new MatTableDataSource(this.billDetailData);
+    this.billDetailDataSource = new MatTableDataSource(this.billDetailData.filter(billDetail => billDetail.status == 0));
     this.billNo = element.billNo;
     this.expandedElement = element;
     console.log(this.billDetailData[0]);
@@ -66,7 +66,9 @@ export class BillingComponent implements OnInit {
   openDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
     var billTotal = 0;
     this.billDetailData.forEach(function (billEntry){
-      billTotal += billEntry.cost;
+      if(billEntry.status == 0){
+        billTotal += billEntry.cost;
+      }
     });
     const dial = this.dialog.open(PayBillComponent, {
       data: { billTotal: billTotal, billNo: this.billDetailData[0].billNo },
@@ -83,6 +85,7 @@ export class BillingComponent implements OnInit {
         // replace the element at that index with the updated appointment data
         if (index !== -1) {
           this.billData[index] = res;
+          this.billDataSource = new MatTableDataSource(this.billData.filter(bill => bill.status == 0));
         }
       }
     })

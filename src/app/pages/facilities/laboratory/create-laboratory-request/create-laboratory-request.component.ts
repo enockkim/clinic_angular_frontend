@@ -45,10 +45,10 @@ export class CreateLaboratoryRequestComponent implements OnInit {
         status: 0,
       }
       const res = await this.LaboratoryService.createLaboratoryRequest(laboratoryRequestData);
-      if(Number(res) != 0){
-        laboratoryRequestData.labId = Number(res);
-        console.log("labid: "+Number(res));
-        this.dialogRef.close(laboratoryRequestData);
+      if(res){
+        //laboratoryRequestData.labId = Number(res);
+        console.log("lab: "+res);
+        this.dialogRef.close(res);
       }else{  
 
       }      
