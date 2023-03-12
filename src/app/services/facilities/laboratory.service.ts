@@ -43,6 +43,10 @@ export class LaboratoryService {
     return await this.http.get<LaboratoryTypes[]>(url).toPromise();
   }
 
+  async transferLab(laboratoryRequest: LaboratoryRequest){
+    const url = `${this.apiUrl}/TransferLab`;
+    return await this.http.post<LaboratoryRequest>(url, laboratoryRequest).toPromise();
+  }
   // deleteProject(Project: Project): Observable<Project> {
   //   const url = `${this.apiUrl}/${Project.pId}`;
   //   return this.http.delete<Project>(url);

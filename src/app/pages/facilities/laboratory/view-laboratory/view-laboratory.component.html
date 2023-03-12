@@ -17,39 +17,56 @@
                                 <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
                                 <td mat-cell *matCellDef="let element">
                                     <button mat-icon-button aria-label="expand row"
-                                        (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()"
-                                        (click)="toggleRow(element)">
-                                        <mat-icon>keyboard_arrow_down</mat-icon>
-                                        <!-- <mat-icon *ngIf="expandedElement === element">keyboard_arrow_up</mat-icon> -->
-                                    </button>
+                                    (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()" (click)="toggleRow(element)">
+                                    <mat-icon *ngIf="expandedElement !== element">keyboard_arrow_down</mat-icon>
+                                    <mat-icon *ngIf="expandedElement === element">keyboard_arrow_up</mat-icon>
+                                  </button>
                                 </td>
                             </ng-container> 
                             <ng-container matColumnDef="expandedDetail">
-                                <td mat-cell *matCellDef="let element" [attr.colspan]="DetailsColumnsToDisplay.length">
-                                    <div class="example-element-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-                                        <table mat-table #outerSort="matSort" [dataSource]="DetailDataSource" multiTemplateDataRows class="mat-elevation-z8" matSort #expandedTable>
-                                            <ng-container matColumnDef="{{column}}"
-                                                *ngFor="let column of DetailsColumnsToDisplay">
-                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{column}} </th>
-                                                <td mat-cell *matCellDef="let element"> {{element[column]}} </td>     
+                                <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplayWithExpand.length">
+                                    <div [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'"><p>hello1</p>
+
+                                        <table mat-table [dataSource]="DetailDataSource" class="mat-elevation-z8">
+
+                                            <!-- Define columns to display -->
+                                            <ng-container *ngFor="let column of DetailsColumnsToDisplay" [matColumnDef]="column">
+                                              <th mat-header-cell *matHeaderCellDef>{{ column }}</th>
+                                              <td mat-cell *matCellDef="let element">{{ element[column] }}</td>
                                             </ng-container>
-                                            <ng-container matColumnDef="expand">
-                                              <th mat-header-cell *matHeaderCellDef aria-label="row actions">&nbsp;</th>
+                                          
+                                            <!-- Add button column -->
+                                            <ng-container matColumnDef="actions">
+                                              <th mat-header-cell *matHeaderCellDef></th>
                                               <td mat-cell *matCellDef="let element">
-                                                <button mat-icon-button aria-label="expand row" (click)="(expandedElement = expandedElement === element ? null : element); $event.stopPropagation()" (click)="toggleRow(element)">
-                                                  <mat-icon>keyboard_arrow_down</mat-icon>
+                                                <button mat-button (click)="loadForm(element)">
+                                                    <mat-icon >keyboard_arrow_right </mat-icon>
                                                 </button>
-                                                <mat-icon>keyboard_arrow_down</mat-icon>
                                               </td>
                                             </ng-container>
+                                          
+                                            <!-- Add columns to display -->
                                             <tr mat-header-row *matHeaderRowDef="DetailsColumnsToDisplay"></tr>
                                             <tr mat-row *matRowDef="let row; columns: DetailsColumnsToDisplay;"></tr>
-                                        </table>
+                                            <tr mat-row *matRowDef="let row; columns: ['actions'];"></tr>
+                                            
+                                          </table>
+                                          
+
+                                        <!-- <table mat-table #outerSort="matSort" [dataSource]="DetailDataSource" multiTemplateDataRows class="mat-elevation-z8" matSort #expandedTable><p>hello1</p>
+                                            <ng-container matColumnDef="{{column}}" *ngFor="let column of DetailsColumnsToDisplay"><p>hello2</p>
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header> {{column}} </th><p>hello3</p>
+                                                <td mat-cell *matCellDef="let element"> {{element[column]}} </td>                    
+                                            </ng-container> <p>hello4</p>
+                                            <tr mat-header-row *matHeaderRowDef="DetailsColumnsToDisplay"><p>hello5</p>  </tr><p>hello6</p>
+                                            <tr mat-row *matRowDef="let row; columns: DetailsColumnsToDisplay;" ><p>hello7</p></tr>
+                                            <p>hello8</p>    
+                                        </table> -->
                                     </div>
                                 </td>
                             </ng-container>
-                            <tr mat-header-row *matHeaderRowDef="DataColumnsToDisplay"></tr>
-                            <tr mat-row *matRowDef="let element; columns: DataColumnsToDisplay;" class="example-element-row" [class.example-expanded-row]="expandedElement === element"
+                            <tr mat-header-row *matHeaderRowDef="columnsToDisplayWithExpand"></tr>
+                            <tr mat-row *matRowDef="let element; columns: columnsToDisplayWithExpand;" class="example-element-row" [class.example-expanded-row]="expandedElement === element"
                                 (click)="expandedElement = expandedElement === element ? null : element">
                             </tr>
                             <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="example-detail-row">
@@ -71,12 +88,12 @@
                         <p class="card-category">{{patientName}}</p>
                     </div>
                     <div class="card-body">
-                        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                        <form [formGroup]="form" (ngSubmit)="transferLab()">
                             <div class="row">
                                 <div class="col-md-12">
                                     <mat-form-field class="example-full-width">
                                         <mat-label>Laboratory Type</mat-label>
-                                        <input matInput value={{this.billTotal}} type="text" placeholder="Payment Refrence">
+                                        <input matInput value={{this.FormData.labTypeId}} type="text" placeholder="Payment Refrence" disabled>
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -84,7 +101,7 @@
                                 <div class="col-md-12">
                                     <mat-form-field class="example-full-width">
                                         <mat-label>Date</mat-label>
-                                        <input matInput value={{this.billTotal}} type="text" disabled>
+                                        <input matInput value={{this.FormData.date}} type="text" disabled>
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -92,7 +109,7 @@
                                 <div class="col-md-12">
                                     <mat-form-field class="example-full-width">
                                         <mat-label>Laboratory Result</mat-label>
-                                        <input matInput value={{this.billTotal}} type="text" disabled>
+                                        <input matInput value={{this.FormData.labResults}} type="text" formControlName="labResult">
                                     </mat-form-field>
                                 </div>
                             </div>
@@ -100,16 +117,18 @@
                                 <div class="col-md-12">
                                     <mat-form-field class="example-full-width">
                                         <mat-label>Lab Technician Remarks</mat-label>
-                                        <input matInput value={{this.billTotal}} type="text" disabled>
+                                        <input matInput value={{this.FormData.labTechRemarks}} type="text" formControlName="labTechRemarks">
                                     </mat-form-field>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-12">
-                                    <mat-form-field class="example-full-width">
-                                        <mat-label>Transfer to</mat-label>
-                                        <input matInput value={{this.billTotal}} type="text" disabled>
-                                    </mat-form-field>
+                                <div class="col-md-12">                                 
+                                    <mat-form-field appearance="fill" class="example-full-width">
+                                        <mat-label>Transfer to: </mat-label>
+                                        <mat-select formControlName="facility">
+                                          <mat-option *ngFor ="let facility of this.facilitiesResult" [value]="facility.facilityId" >{{facility.facilityName}}</mat-option>
+                                        </mat-select>
+                                      </mat-form-field>
                                 </div>
                             </div>
                             <button mat-raised-button type="submit"
